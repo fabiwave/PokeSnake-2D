@@ -48,8 +48,10 @@ if __name__ == '__main__':
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     # We create the models
-    wall = Wall.Wall(5)
-    snake = Snake.Snake(5)
+    grid_size_input = 6
+    real_grid_size = grid_size_input + 2
+    wall = Wall.Wall(real_grid_size)
+    snake = Snake.Snake(real_grid_size)
     background = Background.Background()
 
     # We set the models to the controller

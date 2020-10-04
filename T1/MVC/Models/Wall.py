@@ -1,3 +1,4 @@
+from math import pi
 from CourseResources import easy_shaders as es
 from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
@@ -6,38 +7,42 @@ from CourseResources import transformations as tr
 
 class Wall(object):
 
-    def __init__(self, wea):
-        gpu_body_quad = es.toGPUShape(bs.createColorQuad(255 / 255, 153 / 255, 153 / 255))
-        gpu_leaf_quad = es.toGPUShape(bs.createColorQuad(153 / 255, 255 / 255, 153 / 255))
+    def __init__(self, grid_size):
+        self.total_grid = grid_size
+        self.grid_unit = 2 / self.total_grid
 
-        # We create the body
-        body = sg.SceneGraphNode("Body")
-        body.transform = tr.uniformScale(1)
-        body.childs += [gpu_body_quad]
+        gpu_brick_quad = es.toGPUShape(bs.createColorQuad(255 / 255, 153 / 255, 153 / 255))
 
-        # We create a generic leaf
-        leaves = sg.SceneGraphNode('leaf')
-        leaves.transform = tr.scale(0.25, 0.25, 1)
-        leaves.childs += [gpu_leaf_quad]
+        brick = sg.SceneGraphNode("Brick")
+        brick.transform = tr.matmul(
+            [tr.scale(self.grid_unit, self.grid_unit, 0), tr.translate(0, 0, 0)])
+        brick.childs += [gpu_brick_quad]
 
-        # We create a centered leaf
-        leaf = sg.SceneGraphNode('CenterLeaf')
-        leaf.transform = tr.translate(0, 0.5, 0)
-        leaf.childs += [leaves]
+        # Translation delta
+        t_delta = self.grid_unit / 2
+        wall_children = []
+        i = -1 + t_delta
+        while i < 1:
+            new_brick = sg.SceneGraphNode("Brick " + str(i))
+            new_brick.transform = tr.translate(1 - t_delta, i, 0)
+            new_brick.childs += [brick]
+            wall_children.append(new_brick)
+            i += self.grid_unit
 
-        # We put together all the parts of the Apple
-        apple = sg.SceneGraphNode('apple')
-        apple.transform = tr.matmul([tr.scale(1/wea, 1/wea, 0), tr.translate(1, 0, 0)])
-        apple.childs += [body, leaf]
+        a_wall = sg.SceneGraphNode("Wall")
+        a_wall.transform = tr.identity()
+        a_wall.childs += wall_children
 
-        # We add the apple to the scene graph node
-        transform_apple = sg.SceneGraphNode('appleTR')
-        transform_apple.childs += [apple]
-
-        # We designate the previous apple as the model of this class
-        self.model = transform_apple
-        self.x = 0.5
-        self.y = 1
+        fort = sg.SceneGraphNode("Fort")
+        fort.transform = tr.identity()
+        walls = []
+        for i in range(0, 4):
+            wall = sg.SceneGraphNode("Wall " + str(i))
+            wall.transform = tr.rotationZ(i * pi / 2)
+            wall.childs += [a_wall]
+            walls.append(wall)
+        fort.childs += walls
+        self.model = fort
 
     def draw(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, 'transform')
