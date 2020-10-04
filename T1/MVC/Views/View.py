@@ -6,7 +6,9 @@ from MVC.Models import Snake
 from MVC.Models import Background
 from MVC.Models import Wall
 from MVC.Models import Apple
+from MVC.Models import End
 from MVC.Controllers import Controller
+from math import pi
 
 if __name__ == '__main__':
 
@@ -51,16 +53,16 @@ if __name__ == '__main__':
     grid_size_input = 6
     real_grid_size = grid_size_input + 2
     wall = Wall.Wall(real_grid_size)
-    snake = Snake.Snake(real_grid_size)
-    background = Background.Background()
     apple = Apple.Apple(real_grid_size)
+    snake = Snake.Snake(real_grid_size, apple)
+    background = Background.Background()
+    end_scene = End.End()
 
     # Models to control by the controller are set
     controller.set_snake(snake)
 
     # Game logic to play the Snake
     while not glfw.window_should_close(window):
-
         # We obtain the events
         glfw.poll_events()
 
@@ -74,10 +76,10 @@ if __name__ == '__main__':
         apple.draw(pipeline)
 
         # Handles the apple been eaten by snake
-        if apple.get_position() == snake.get_position():
-            apple.respawn()
-
+        snake.eat_apple()
         # Handles the snake collide against a wall
+        if snake.collision():
+            end_scene.draw(pipeline)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)

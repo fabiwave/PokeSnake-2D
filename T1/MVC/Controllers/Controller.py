@@ -6,6 +6,7 @@ class Controller(object):
 
     def __init__(self):
         self.snake = None
+        self.press = None
 
     def set_snake(self, snake):
         self.snake = snake
@@ -17,17 +18,17 @@ class Controller(object):
         if key == glfw.KEY_ESCAPE:
             sys.exit()
 
-        elif key == glfw.KEY_LEFT and action == glfw.PRESS:
+        elif (key == glfw.KEY_LEFT or key == glfw.KEY_A) and action == glfw.PRESS:
             self.snake.move_left()
 
-        elif key == glfw.KEY_RIGHT and action == glfw.PRESS:
+        elif (key == glfw.KEY_RIGHT or key == glfw.KEY_D) and action == glfw.PRESS:
             self.snake.move_right()
 
-        elif key == glfw.KEY_UP and action == glfw.PRESS:
+        elif (key == glfw.KEY_UP or key == glfw.KEY_W) and action == glfw.PRESS:
             self.snake.move_up()
 
-        elif key == glfw.KEY_DOWN and action == glfw.PRESS:
+        elif (key == glfw.KEY_DOWN or key == glfw.KEY_S) and action == glfw.PRESS:
             self.snake.move_down()
 
         else:
-            print('Unknown key')
+            return

@@ -12,6 +12,7 @@ class Apple(object):
         self.total_grid = grid_size
         self.grid_unit = 2 / self.total_grid
 
+        # Basic color shapes
         gpu_center_vertical_quad = es.toGPUShape(bs.createColorQuad(240 / 255, 85 / 255, 94 / 255))
         gpu_center_horizontal_quad = es.toGPUShape(bs.createColorQuad(240 / 255, 85 / 255, 94 / 255))
         gpu_berry_part_quad = es.toGPUShape(bs.createColorQuad(240 / 255, 85 / 255, 94 / 255))
@@ -78,9 +79,12 @@ class Apple(object):
         transform_apple.childs += [apple]
 
         # Designation of the previous apple as the model of this class
-        half_grid = (self.total_grid - 2) / 2
-        random_x = randint(-half_grid, half_grid - 1)
-        random_y = randint(-half_grid, half_grid - 1)
+        half_grid = int((self.total_grid - 2) / 2)
+        if self.total_grid % 2 == 0:
+            half_grid = half_grid - 1
+
+        random_x = randint(-half_grid, half_grid)
+        random_y = randint(-half_grid, half_grid)
 
         self.model = transform_apple
         self.pos_x = self.t_delta + (random_x * self.grid_unit)
@@ -104,9 +108,11 @@ class Apple(object):
 
     # Changes the position of the apple in the grid
     def respawn(self):
-        half_grid = (self.total_grid - 2) / 2
-        random_x = randint(-half_grid, half_grid - 1)
-        random_y = randint(-half_grid, half_grid - 1)
+        half_grid = int((self.total_grid - 2) / 2)
+        if self.total_grid % 2 == 0:
+            half_grid = half_grid - 1
+        random_x = randint(-half_grid, half_grid)
+        random_y = randint(-half_grid, half_grid)
         self.pos_x = self.t_delta + (random_x * self.grid_unit)
         self.pos_y = self.t_delta + (random_y * self.grid_unit)
         self.update_pos()

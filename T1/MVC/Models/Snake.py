@@ -6,14 +6,17 @@ from CourseResources import transformations as tr
 
 class Snake(object):
 
-    def __init__(self, grid_size):
+    def __init__(self, grid_size, apple):
 
         # Basics variables set up
         self.total_grid = grid_size
         self.grid_unit = 2 / self.total_grid
+        self.apple = apple
+        self.alive = True
+        self.last_mov = None
 
         # Creation of basic figure of the Snake
-        gpu_body_quad = es.toGPUShape(bs.createColorQuad(133 / 255, 94 / 255, 68 / 255))
+        gpu_body_quad = es.toGPUShape(bs.createRainbowQuad())
         gpu_leg_quad = es.toGPUShape(bs.createColorQuad(255 / 255, 250 / 255, 218 / 255))
 
         # Creation of the body
@@ -65,7 +68,6 @@ class Snake(object):
         self.model = transform_snake
         self.pos_x = self.t_delta
         self.pos_y = self.t_delta
-        self.alive = True
 
         # Translation of the snake to the center position
         self.model.transform = tr.translate(self.t_delta, self.t_delta, 0)
@@ -83,35 +85,64 @@ class Snake(object):
         if self.alive:
             self.pos_x -= self.grid_unit
             self.update_pos()
+            self.last_mov = "Left"
 
     # Moves the model to the right in the grid
     def move_right(self):
         if self.alive:
             self.pos_x += self.grid_unit
             self.update_pos()
+            self.last_mov = "Right"
 
     # Moves the model down in the grid
     def move_down(self):
         if self.alive:
             self.pos_y -= self.grid_unit
             self.update_pos()
+            self.last_mov = "Down"
 
     # Moves the model up in the grid
     def move_up(self):
         if self.alive:
             self.pos_y += self.grid_unit
             self.update_pos()
+            self.last_mov = "Up"
 
     # Returns if the snake is colliding into a wall
     def collision(self):
         wall_boolean = False
-        wall_pos = 1 - self.grid_unit + self.t_delta
+        wall_pos = 1 - self.grid_unit
 
-        if self.pos_x == wall_pos or self.pos_x == -wall_pos or self.pos_y == wall_pos or self.pos_y == -wall_pos:
+        if self.pos_x >= wall_pos or self.pos_x <= -wall_pos or self.pos_y >= wall_pos or self.pos_y <= -wall_pos:
             self.alive = False
+            wall_boolean = True
 
         return wall_boolean
 
-    # Returns the position of the apple
+    # Returns the position of the Snake
     def get_position(self):
         return [self.pos_x, self.pos_y]
+
+    # Handles the apple been eaten by snake
+    def eat_apple(self):
+        if self.apple.get_position() == self.get_position():
+            self.apple.respawn()
+
+    # Returns the last movement of the snake
+    def get_last_move(self):
+        return self.last_mov
+
+    # Sets the last movement of the snake
+    def set_last_move(self, orientation):
+        self.last_mov = orientation
+
+    def continue_move(self):
+        if not self.collision():
+            if self.last_mov == "Right":
+                self.move_right()
+            elif self.last_mov == "Left":
+                self.move_left()
+            elif self.last_mov == "Down":
+                self.move_down()
+            elif self.last_mov == "Up":
+                self.move_up()
