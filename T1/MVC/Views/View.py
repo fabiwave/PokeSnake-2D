@@ -5,8 +5,8 @@ from CourseResources import easy_shaders as es
 from MVC.Models import Snake
 from MVC.Models import Background
 from MVC.Models import Wall
+from MVC.Models import Apple
 from MVC.Controllers import Controller
-
 
 if __name__ == '__main__':
 
@@ -26,10 +26,10 @@ if __name__ == '__main__':
         glfw.terminate()
         sys.exit()
 
-    # We set the window as the current window
+    # Set the window as the current window
     glfw.make_context_current(window)
 
-    # We set the controller
+    # Set the controller
     controller = Controller.Controller()
 
     # Connecting the callback function 'on_key' to handle keyboard events
@@ -47,17 +47,18 @@ if __name__ == '__main__':
     # Our shapes here are always fully painted
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
-    # We create the models
+    # Creation of the models
     grid_size_input = 6
     real_grid_size = grid_size_input + 2
     wall = Wall.Wall(real_grid_size)
     snake = Snake.Snake(real_grid_size)
     background = Background.Background()
+    apple = Apple.Apple(real_grid_size)
 
-    # We set the models to the controller
+    # Models to control by the controller are set
     controller.set_snake(snake)
 
-    # Here we draw the models to play the Snake
+    # Game logic to play the Snake
     while not glfw.window_should_close(window):
 
         # We obtain the events
@@ -66,15 +67,17 @@ if __name__ == '__main__':
         # Clearing the screen in both, color and depth
         glClear(GL_COLOR_BUFFER_BIT)
 
-        # Dibujar los modelos
-        # 1. Field
-        # 2. Walls
-
-        # 3. Apple
+        # Draws the nodes of the scene
         background.draw(pipeline)
         wall.draw(pipeline)
-        # 4. Snake
         snake.draw(pipeline)
+        apple.draw(pipeline)
+
+        # Handles the apple been eaten by snake
+        if apple.get_position() == snake.get_position():
+            apple.respawn()
+
+        # Handles the snake collide against a wall
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)
