@@ -2,6 +2,7 @@ from CourseResources import easy_shaders as es
 from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
+from math import pi
 
 
 class Snake(object):
@@ -39,16 +40,6 @@ class Snake(object):
         leg_izq1.transform = tr.translate(-0.5, 0.5, 0)
         leg_izq1.childs += [leg]
 
-        # Creation of lower right leg
-        leg_der = sg.SceneGraphNode('legRight')
-        leg_der.transform = tr.translate(0.5, -0.5, 0)
-        leg_der.childs += [leg]
-
-        # Creation of upper right leg
-        leg_der1 = sg.SceneGraphNode('legRight')
-        leg_der1.transform = tr.translate(0.5, 0.5, 0)
-        leg_der1.childs += [leg]
-
         # Translation delta for adjustment of the snake in the grid
         self.t_delta = 0
         if self.total_grid % 2 == 0:
@@ -58,7 +49,7 @@ class Snake(object):
         snake = sg.SceneGraphNode('snake')
         snake.transform = tr.matmul(
             [tr.scale(self.grid_unit, self.grid_unit, 0), tr.translate(0, 0, 0)])
-        snake.childs += [body, leg_izq, leg_der, leg_der1, leg_izq1]
+        snake.childs += [body, leg_izq, leg_izq1]
 
         # Addition the snake to the scene graph node
         transform_snake = sg.SceneGraphNode('snakeTR')
@@ -75,6 +66,10 @@ class Snake(object):
     # Draws the snake node into the scene
     def draw(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, 'transform')
+
+    # Returns the position of the Snake
+    def get_position(self):
+        return [self.pos_x, self.pos_y]
 
     # Updates the position of the model
     def update_pos(self):
@@ -108,6 +103,26 @@ class Snake(object):
             self.update_pos()
             self.last_mov = "Up"
 
+    # Returns the last movement of the snake
+    def get_last_move(self):
+        return self.last_mov
+
+    # Sets the last movement of the snake
+    def set_last_move(self, orientation):
+        self.last_mov = orientation
+
+    # Continues the last movement of the snake
+    def continue_move(self):
+        if not self.collision():
+            if self.last_mov == "Right":
+                self.move_right()
+            elif self.last_mov == "Left":
+                self.move_left()
+            elif self.last_mov == "Down":
+                self.move_down()
+            elif self.last_mov == "Up":
+                self.move_up()
+    
     # Returns if the snake is colliding into a wall
     def collision(self):
         wall_boolean = False
@@ -119,30 +134,9 @@ class Snake(object):
 
         return wall_boolean
 
-    # Returns the position of the Snake
-    def get_position(self):
-        return [self.pos_x, self.pos_y]
-
     # Handles the apple been eaten by snake
     def eat_apple(self):
-        if self.apple.get_position() == self.get_position():
+        x_delta = abs(self.pos_x - self.apple.get_position()[0])
+        y_delta = abs(self.pos_y - self.apple.get_position()[1])
+        if x_delta <= (self.grid_unit / 4) and y_delta <= (self.grid_unit / 4):
             self.apple.respawn()
-
-    # Returns the last movement of the snake
-    def get_last_move(self):
-        return self.last_mov
-
-    # Sets the last movement of the snake
-    def set_last_move(self, orientation):
-        self.last_mov = orientation
-
-    def continue_move(self):
-        if not self.collision():
-            if self.last_mov == "Right":
-                self.move_right()
-            elif self.last_mov == "Left":
-                self.move_left()
-            elif self.last_mov == "Down":
-                self.move_down()
-            elif self.last_mov == "Up":
-                self.move_up()
