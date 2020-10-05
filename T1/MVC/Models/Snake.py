@@ -13,7 +13,7 @@ class Snake(object):
         self.grid_unit = 2 / self.total_grid
         self.apple = apple
         self.alive = True
-        self.last_mov = None
+        self.last_mov = "Up"
 
         # Creation of basic figure of the Snake
         gpu_body_quad = es.toGPUShape(bs.createRainbowQuad())

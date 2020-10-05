@@ -8,7 +8,6 @@ from MVC.Models import Wall
 from MVC.Models import Apple
 from MVC.Models import End
 from MVC.Controllers import Controller
-from math import pi
 
 if __name__ == '__main__':
 
@@ -50,7 +49,7 @@ if __name__ == '__main__':
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     # Creation of the models
-    grid_size_input = 6
+    grid_size_input = 11
     real_grid_size = grid_size_input + 2
     wall = Wall.Wall(real_grid_size)
     apple = Apple.Apple(real_grid_size)
@@ -74,6 +73,16 @@ if __name__ == '__main__':
         wall.draw(pipeline)
         snake.draw(pipeline)
         apple.draw(pipeline)
+
+        # Movement of the snake
+        current_time = glfw.get_time()
+        delta = current_time - controller.get_time()
+
+        # Time of update of movement
+        time = 0.4
+        if delta > time:
+            controller.add_time(time)
+            snake.continue_move()
 
         # Handles the apple been eaten by snake
         snake.eat_apple()
