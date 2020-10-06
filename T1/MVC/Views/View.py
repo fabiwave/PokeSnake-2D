@@ -11,6 +11,8 @@ from MVC.Controllers import Controller
 
 if __name__ == '__main__':
 
+    last_move = 0.0
+
     # We initialize glfw
     if not glfw.init():
         sys.exit()
@@ -49,7 +51,7 @@ if __name__ == '__main__':
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     # Creation of the models
-    grid_size_input = 11
+    grid_size_input = 10
     real_grid_size = grid_size_input + 2
     wall = Wall.Wall(real_grid_size)
     apple = Apple.Apple(real_grid_size)
@@ -76,13 +78,13 @@ if __name__ == '__main__':
 
         # Movement of the snake
         current_time = glfw.get_time()
-        delta = current_time - controller.get_time()
+        time = 0.7
+        delta = current_time - last_move
 
-        # Time of update of movement
-        time = 0.4
+        # Time for update of movement
         if delta > time:
-            controller.add_time(time)
             snake.continue_move()
+            last_move = glfw.get_time()
 
         # Handles the apple been eaten by snake
         snake.eat_apple()
