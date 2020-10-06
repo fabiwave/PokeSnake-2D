@@ -15,6 +15,9 @@ class Snake(object):
         self.apple = apple
         self.alive = True
         self.last_mov = "Up"
+        self.theta = pi / 2
+        self.snake_child = []
+        self._rotations = {"Up": pi / 2, "Left": pi, "Down": 3 * pi / 2, "Right": 2 * pi}
 
         # Creation of basic figure of the Snake
         gpu_body_quad = es.toGPUShape(bs.createRainbowQuad())
@@ -71,36 +74,42 @@ class Snake(object):
     def get_position(self):
         return [self.pos_x, self.pos_y]
 
+    def set_position(self, x, y):
+        self.pos_x = x
+        self.pos_y = y
+
     # Updates the position of the model
-    def update_pos(self):
-        self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
+    def update_pos(self, new_dir="Up"):
+        rotation = self.rotate(new_dir)
+        translation = tr.translate(self.pos_x, self.pos_y, 0)
+        self.model.transform = tr.matmul([translation, rotation])
 
     # Moves the model to the left in the grid
     def move_left(self):
         if self.alive:
             self.pos_x -= self.grid_unit
-            self.update_pos()
+            self.update_pos("Left")
             self.last_mov = "Left"
 
     # Moves the model to the right in the grid
     def move_right(self):
         if self.alive:
             self.pos_x += self.grid_unit
-            self.update_pos()
+            self.update_pos("Right")
             self.last_mov = "Right"
 
     # Moves the model down in the grid
     def move_down(self):
         if self.alive:
             self.pos_y -= self.grid_unit
-            self.update_pos()
+            self.update_pos("Down")
             self.last_mov = "Down"
 
     # Moves the model up in the grid
     def move_up(self):
         if self.alive:
             self.pos_y += self.grid_unit
-            self.update_pos()
+            self.update_pos("Up")
             self.last_mov = "Up"
 
     # Returns the last movement of the snake
@@ -122,7 +131,7 @@ class Snake(object):
                 self.move_down()
             elif self.last_mov == "Up":
                 self.move_up()
-    
+
     # Returns if the snake is colliding into a wall
     def collision(self):
         wall_boolean = False
@@ -140,3 +149,9 @@ class Snake(object):
         y_delta = abs(self.pos_y - self.apple.get_position()[1])
         if x_delta <= (self.grid_unit / 4) and y_delta <= (self.grid_unit / 4):
             self.apple.respawn()
+            # self.add_snake()
+
+    def rotate(self, new_dir):
+        rotation = self._rotations[new_dir]
+        transform = tr.rotationZ(rotation)
+        return transform
