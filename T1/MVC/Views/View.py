@@ -89,7 +89,7 @@ if __name__ == '__main__':
         # Handles the apple been eaten by snake
         snake.eat_apple()
         # Handles the snake collide against a wall
-        if snake.collision():
+        if snake.wall_collision() or snake.snake_collision():
             end_scene.draw(pipeline)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.

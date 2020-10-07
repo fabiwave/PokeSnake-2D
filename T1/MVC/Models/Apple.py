@@ -107,12 +107,24 @@ class Apple(object):
         self.model.transform = tr.translate(self.pos_x, self.pos_y, 0)
 
     # Changes the position of the apple in the grid
-    def respawn(self):
+    def respawn(self, snake):
+
         half_grid = int((self.total_grid - 2) / 2)
         if self.total_grid % 2 == 0:
             half_grid = half_grid - 1
+
         random_x = randint(-half_grid, half_grid)
         random_y = randint(-half_grid, half_grid)
-        self.pos_x = self.t_delta + (random_x * self.grid_unit)
-        self.pos_y = self.t_delta + (random_y * self.grid_unit)
+        pos_x = self.t_delta + (random_x * self.grid_unit)
+        pos_y = self.t_delta + (random_y * self.grid_unit)
+
+        # If the position its in the snake, it has to be regenerated
+        while snake.check_in_snake([pos_x, pos_y]):
+            random_x = randint(-half_grid, half_grid)
+            random_y = randint(-half_grid, half_grid)
+            pos_x = self.t_delta + (random_x * self.grid_unit)
+            pos_y = self.t_delta + (random_y * self.grid_unit)
+
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.update_pos()

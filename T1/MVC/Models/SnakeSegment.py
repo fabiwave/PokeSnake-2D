@@ -81,6 +81,7 @@ class SnakeSegment(object):
 
     # Updates the position of the model
     def update_pos(self, new_dir="Up"):
+        # TODO: Checkear no comer serpiente
         rotation = self.rotate(new_dir)
         translation = tr.translate(self.pos_x, self.pos_y, 0)
         self.model.transform = tr.matmul([translation, rotation])
@@ -126,7 +127,7 @@ class SnakeSegment(object):
 
     # Continues the last movement of the snake
     def continue_move(self):
-        if not self.collision():
+        if not self.wall_collision():
             if self.last_mov == "Right":
                 self.move_right()
             elif self.last_mov == "Left":
@@ -137,7 +138,7 @@ class SnakeSegment(object):
                 self.move_up()
 
     # Returns if the snake is colliding into a wall
-    def collision(self):
+    def wall_collision(self):
         wall_boolean = False
         wall_pos = 1 - self.grid_unit
 
@@ -146,6 +147,14 @@ class SnakeSegment(object):
             wall_boolean = True
 
         return wall_boolean
+
+    def snake_collision(self):
+        collision = False
+        if self.next_segment is not None:
+            if self.next_segment.check_in_snake([self.pos_x, self.pos_y]):
+                collision = True
+                self.alive = False
+        return collision
 
     def rotate(self, new_dir):
         rotation = self._rotations[new_dir]
@@ -172,3 +181,14 @@ class SnakeSegment(object):
         rotation = self.rotate(self.last_mov)
         translation = tr.translate(self.pos_x, self.pos_y, 0)
         self.model.transform = tr.matmul([translation, rotation])
+
+    def check_in_snake(self, position):
+        current_pos = [self.pos_x, self.pos_y]
+        x_delta = abs(current_pos[0] - position[0])
+        y_delta = abs(current_pos[1] - position[1])
+        if x_delta <= (self.grid_unit / 4) and y_delta <= (self.grid_unit / 4):
+            return True
+        elif self.next_segment is None:
+            return False
+        else:
+            return self.next_segment.check_in_snake(position)

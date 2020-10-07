@@ -4,7 +4,6 @@ from MVC.Models.SnakeSegment import SnakeSegment
 class Snake(object):
 
     def __init__(self, grid_size, apple):
-
         # Basics variables set up
         self.head = SnakeSegment(grid_size)
         self.apple = apple
@@ -44,8 +43,12 @@ class Snake(object):
         self.head.continue_move()
 
     # Returns if the snake is colliding into a wall
-    def collision(self):
-        return self.head.collision()
+    def wall_collision(self):
+        return self.head.wall_collision()
+
+    # Returns if the snake is colliding with a snake segment
+    def snake_collision(self):
+        return self.head.snake_collision()
 
     # Handles the apple been eaten by snake
     def eat_apple(self):
@@ -54,5 +57,7 @@ class Snake(object):
         y_delta = abs(current_pos[1] - self.apple.get_position()[1])
         if x_delta <= (self.grid_unit / 4) and y_delta <= (self.grid_unit / 4):
             self.head.add_segment()
-            # TODO: Check apple respawn
-            self.apple.respawn()
+            self.apple.respawn(self)
+
+    def check_in_snake(self, position):
+        return self.head.check_in_snake(position)
