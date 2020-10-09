@@ -1,5 +1,8 @@
+import os
 import sys
 import glfw
+import pygame
+from math import pi
 from OpenGL.GL import *
 from CourseResources import easy_shaders as es
 from MVC.Models import Snake
@@ -9,8 +12,8 @@ from MVC.Models import Apple
 from MVC.Models import End
 from MVC.Controllers import Controller
 
-if __name__ == '__main__':
 
+def run(grid_size=10):
     last_move = 0.0
 
     # We initialize glfw
@@ -52,8 +55,7 @@ if __name__ == '__main__':
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     # Creation of the models
-    grid_size_input = 10
-    real_grid_size = grid_size_input + 2
+    real_grid_size = grid_size + 2
     wall = Wall.Wall(real_grid_size)
     apple = Apple.Apple(real_grid_size)
     snake = Snake.Snake(real_grid_size, apple)
@@ -62,6 +64,13 @@ if __name__ == '__main__':
 
     # Models to control by the controller are set
     controller.set_snake(snake)
+
+    # Initializes pygame for music
+    music_path = os.path.abspath(os.path.dirname(__file__))
+    pygame.init()
+    pygame.mixer.music.load(os.path.join(music_path, 'caminar.mp3'))
+    pygame.mixer.music.play(-1, 0)
+    game_over_time = 0
 
     # Game logic to play the Snake
     while not glfw.window_should_close(window):
@@ -79,7 +88,7 @@ if __name__ == '__main__':
 
         # Movement of the snake
         current_time = glfw.get_time()
-        time = 1
+        time = 0.35
         delta = current_time - last_move
 
         # Time for update of movement
@@ -89,9 +98,17 @@ if __name__ == '__main__':
 
         # Handles the apple been eaten by snake
         snake.eat_apple()
+
         # Handles the snake collide against a wall
         if snake.wall_collision() or snake.snake_collision():
             end_scene.draw(pipeline_texture)
+            if game_over_time == 0:
+                game_over_time = glfw.get_time()
+                pygame.mixer.music.load(os.path.join(music_path, 'game_over.mp3'))
+                pygame.mixer.music.play(-1, 0)
+            else:
+                current_time = glfw.get_time()
+                end_scene.rotate((current_time - game_over_time) * pi / 8)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)

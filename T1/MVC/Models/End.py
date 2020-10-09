@@ -2,7 +2,6 @@ from CourseResources import easy_shaders as es
 from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
-from math import pi
 from OpenGL.GL import *
 
 
@@ -26,3 +25,6 @@ class End(object):
     # Draws the end node into the scene
     def draw(self, pipeline):
         sg.drawSceneGraphNode(self.model, pipeline, 'transform')
+
+    def rotate(self, angle):
+        self.model.transform = tr.rotationZ(angle)
