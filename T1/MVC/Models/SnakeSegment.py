@@ -3,6 +3,7 @@ from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
 from math import pi
+from OpenGL.GL import *
 
 
 class SnakeSegment(object):
@@ -19,28 +20,14 @@ class SnakeSegment(object):
         self._rotations = {"Up": pi / 2, "Left": pi, "Down": 3 * pi / 2, "Right": 2 * pi}
 
         # Creation of basic figure of the Snake
-        gpu_body_quad = es.toGPUShape(bs.createRainbowQuad())
-        gpu_leg_quad = es.toGPUShape(bs.createColorQuad(255 / 255, 250 / 255, 218 / 255))
+        gpu_body_quad = es.toGPUShape(
+            bs.createTextureQuad("/home/fabiwave/PycharmProjects/T1C-poke-snake/T1/MVC/Models/Images/snake.png"),
+            GL_REPEAT, GL_NEAREST)
 
         # Creation of the body
         body = sg.SceneGraphNode("Body")
         body.transform = tr.uniformScale(1)
         body.childs += [gpu_body_quad]
-
-        # Creation of a generic leg
-        leg = sg.SceneGraphNode("Legs")
-        leg.transform = tr.scale(0.25, 0.25, 1)
-        leg.childs += [gpu_leg_quad]
-
-        # Creation of lower left leg
-        leg_izq = sg.SceneGraphNode('legLeft')
-        leg_izq.transform = tr.translate(-0.5, -0.5, 0)
-        leg_izq.childs += [leg]
-
-        # Creation of upper left leg
-        leg_izq1 = sg.SceneGraphNode('legLeft1')
-        leg_izq1.transform = tr.translate(-0.5, 0.5, 0)
-        leg_izq1.childs += [leg]
 
         # Translation delta for adjustment of the snake in the grid
         self.t_delta = 0
@@ -51,7 +38,7 @@ class SnakeSegment(object):
         snake = sg.SceneGraphNode('snake')
         snake.transform = tr.matmul(
             [tr.scale(self.grid_unit, self.grid_unit, 0), tr.translate(0, 0, 0)])
-        snake.childs += [body, leg_izq, leg_izq1]
+        snake.childs += [body]
 
         # Addition the snake to the scene graph node
         transform_snake = sg.SceneGraphNode('snakeTR')
@@ -81,7 +68,6 @@ class SnakeSegment(object):
 
     # Updates the position of the model
     def update_pos(self, new_dir="Up"):
-        # TODO: Checkear no comer serpiente
         rotation = self.rotate(new_dir)
         translation = tr.translate(self.pos_x, self.pos_y, 0)
         self.model.transform = tr.matmul([translation, rotation])

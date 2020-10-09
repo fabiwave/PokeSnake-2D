@@ -3,6 +3,7 @@ from CourseResources import easy_shaders as es
 from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
+from OpenGL.GL import *
 
 
 class Wall(object):
@@ -14,7 +15,9 @@ class Wall(object):
         self.grid_unit = 2 / self.total_grid
 
         # Creation of basic figure of the Wall
-        gpu_brick_quad = es.toGPUShape(bs.createColorQuad(255 / 255, 153 / 255, 153 / 255))
+        gpu_brick_quad = es.toGPUShape(
+            bs.createTextureQuad("/home/fabiwave/PycharmProjects/T1C-poke-snake/T1/MVC/Models/Images/bush.png"),
+            GL_REPEAT, GL_NEAREST)
 
         # Creation of the a generic brick node
         brick = sg.SceneGraphNode("Brick")

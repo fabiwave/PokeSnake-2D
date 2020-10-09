@@ -39,10 +39,11 @@ if __name__ == '__main__':
     glfw.set_key_callback(window, controller.on_key)
 
     # Assembling the shader program (pipeline) with both shaders
-    pipeline = es.SimpleTransformShaderProgram()
+    pipeline_color = es.SimpleTransformShaderProgram()
+    pipeline_texture = es.SimpleTextureTransformShaderProgram()
 
     # Telling OpenGL to use our shader program
-    glUseProgram(pipeline.shaderProgram)
+    glUseProgram(pipeline_texture.shaderProgram)
 
     # Setting up the clear screen color
     glClearColor(0.85, 0.85, 0.85, 1.0)
@@ -71,14 +72,14 @@ if __name__ == '__main__':
         glClear(GL_COLOR_BUFFER_BIT)
 
         # Draws the nodes of the scene
-        background.draw(pipeline)
-        wall.draw(pipeline)
-        snake.draw(pipeline)
-        apple.draw(pipeline)
+        background.draw(pipeline_texture)
+        wall.draw(pipeline_texture)
+        snake.draw(pipeline_texture)
+        apple.draw(pipeline_color)
 
         # Movement of the snake
         current_time = glfw.get_time()
-        time = 0.7
+        time = 1
         delta = current_time - last_move
 
         # Time for update of movement
@@ -90,7 +91,7 @@ if __name__ == '__main__':
         snake.eat_apple()
         # Handles the snake collide against a wall
         if snake.wall_collision() or snake.snake_collision():
-            end_scene.draw(pipeline)
+            end_scene.draw(pipeline_texture)
 
         # Once the render is done, buffers are swapped, showing only the complete scene.
         glfw.swap_buffers(window)

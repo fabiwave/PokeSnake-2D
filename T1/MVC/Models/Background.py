@@ -2,14 +2,16 @@ from CourseResources import easy_shaders as es
 from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
+from OpenGL.GL import *
 
 
 class Background(object):
 
     def __init__(self):
-
         # Creation of basic figure of the background
-        gpu_background_quad = es.toGPUShape(bs.createColorQuad(118 / 255, 193 / 255, 159 / 255))
+        gpu_background_quad = es.toGPUShape(
+            bs.createTextureQuad("/home/fabiwave/PycharmProjects/T1C-poke-snake/T1/MVC/Models/Images/grass.png"),
+            GL_REPEAT, GL_NEAREST)
         background = sg.SceneGraphNode("Background")
         background.transform = tr.uniformScale(1)
         background.childs += [gpu_background_quad]

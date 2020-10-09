@@ -1,6 +1,7 @@
 from MVC.Models.SnakeSegment import SnakeSegment
 
 
+
 class Snake(object):
 
     def __init__(self, grid_size, apple):

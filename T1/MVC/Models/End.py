@@ -3,13 +3,16 @@ from CourseResources import basic_shapes as bs
 from CourseResources import scene_graph as sg
 from CourseResources import transformations as tr
 from math import pi
+from OpenGL.GL import *
 
 
 class End(object):
 
     def __init__(self):
         # Creation of basic figure of the end scene
-        gpu_background_quad = es.toGPUShape(bs.createColorQuad(0 / 255, 0 / 255, 0 / 255))
+        gpu_background_quad = es.toGPUShape(
+            bs.createTextureQuad("/home/fabiwave/PycharmProjects/T1C-poke-snake/T1/MVC/Models/Images/end.png"),
+            GL_REPEAT, GL_NEAREST)
         end_scene = sg.SceneGraphNode("End")
         end_scene.transform = tr.uniformScale(1)
         end_scene.childs += [gpu_background_quad]
